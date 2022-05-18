@@ -3,7 +3,8 @@ from apis.twitter_api import get_user_information, get_user_recent_tweets
 from classifiers.classifier_manager import ClassifierManager
 
 app = Flask(__name__)
-classifie = ClassifierManager()
+manager = ClassifierManager(['asd', 'sdasd'])
+print(manager)
 
 @app.route('/user/<id>', methods=['GET'])
 def get_user(id):
