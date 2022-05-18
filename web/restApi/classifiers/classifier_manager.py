@@ -1,9 +1,9 @@
 import pickle
-
+from utils import process_tweet
 
 class ClassifierManager:
     def __init__(self, tweet_list: list):
-        self.tweets = tweet_list
+        self.raw_tweets = tweet_list
         self.predicted_tweets = []
         self._politics_classifier = None
         self._food_classifier = None
@@ -15,7 +15,7 @@ class ClassifierManager:
 
     def _initialize_classifiers(self):
         # 1. Politics classifier : linear SVM
-        with open('resources/politics_linearSVM.', 'rb') as f:
+        with open('resources/politics_linearSVM2', 'rb') as f:
             self._politics_classifier = pickle.load(f)
 
         # 2. Food Classifier : Naive Bayes
@@ -31,7 +31,11 @@ class ClassifierManager:
             self._politics_classifier = pickle.load(f)
 
     def _predict_tweets(self):
-        pass
+        for raw in self.raw_tweets:
+            clean_tweet = process_tweet(raw)
 
     def process_tweets(self):
         pass
+
+    def _classify(self, cleaned_tweet):
+        self._politics_classifier.predict()
