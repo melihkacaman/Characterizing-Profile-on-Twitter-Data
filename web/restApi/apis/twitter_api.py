@@ -1,4 +1,7 @@
 import tweepy as tw
+from templates.profile import Profile
+from common.error import Error
+from common.result_back import Result
 
 # constants
 API_KEY = 'B7Y17gCCAfTe515xuZwGhuVlH'
@@ -9,20 +12,31 @@ ACCESS_TOKEN = '1440392138697547777-ZbNqj8Vz27k9mk4s009V76REekQpoY'
 ACCESS_TOKEN_SECRET = 'ik2qalQeHpdw5cbU6QNtqZl2HYnmDVRQ1cRPbv9WPpywu'
 
 
-def get_user_information(user_name):
+def get_user_information(user_name: str):
     usernames = Client.get_instance().get_users(usernames=[user_name])
+    result = None
     if usernames.data is not None:
-        return {
-            'user_id': usernames.data[0].id,
-            'name': usernames.data[0].name,
-            'user_name': usernames.data[0].username
-        }
+        result = Result(Profile(usernames.data[0].id, usernames.data[0].name, usernames.data[0].username))
     else:
-        return {
-            'user_id': None,
-            'name': None,
-            'user_name': None
-        }
+        result = Result(None, Error('Not Found the User that you gave', 'User Not Found'))
+
+    return result
+
+
+def get_user_recent_tweets(username: str):
+    user = get_user_information(username)
+    if not user.exist_error():
+        tweet_list = []
+        for tweet in tw.Paginator(Client.get_instance().get_users_tweets, id=user.result_object.user_id,
+                                  max_results=100,
+                                  tweet_fields=['lang']).flatten(limit=1000):
+            if tweet.lang == 'en' or tweet.lang == 'EN':
+                tweet_list.append(tweet.text)
+        return Result({
+            'tweet_list': tweet_list
+        }, None)
+    else:
+        return Result(None, Error("Username not found", 'User Not Found'))
 
 
 class Client:
