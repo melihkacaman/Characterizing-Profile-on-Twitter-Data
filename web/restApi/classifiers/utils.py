@@ -1,5 +1,6 @@
-import numpy as np 
+import numpy as np
 import ast
+
 
 def generate_tweets_list(dataframe_single):
     '''
@@ -13,12 +14,13 @@ def generate_tweets_list(dataframe_single):
     train_x_arr : list 
         Converted version of the argument 
     '''
-    train_x_arr = [] 
-    for index, row in dataframe_single.iterrows(): 
-        for a in row.values: 
+    train_x_arr = []
+    for index, row in dataframe_single.iterrows():
+        for a in row.values:
             train_x_arr.append(ast.literal_eval(a))
-        
+
     return train_x_arr
+
 
 def build_freqs(train_x, train_y):
     '''
@@ -34,9 +36,9 @@ def build_freqs(train_x, train_y):
         it returns dictionary that includes key and values like below; 
         (word, label) : number of times appeared 
     '''
-    
+
     yslist = np.squeeze(train_y).tolist()
-    
+
     freqs = {}
     for y, tweet in zip(yslist, train_x):
         for word in tweet:
@@ -48,7 +50,8 @@ def build_freqs(train_x, train_y):
 
     return freqs
 
-# -------------------------------- 
+
+# --------------------------------
 # Naive Bayes Functions 
 
 def count_tweets(tweets, ys):
@@ -59,20 +62,21 @@ def count_tweets(tweets, ys):
     Output:
         result: a dictionary mapping each pair to its frequency
     '''
-    result = dict() 
-    
+    result = dict()
+
     for y, tweet in zip(ys, tweets):
         for word in tweet:
-          
-            pair = (word,y)
+
+            pair = (word, y)
             # if the key exists in the dictionary, increment the count
             if pair in result:
                 result[pair] += 1
             # else, if the key is new, add it to the dictionary and set the count to 1
             else:
                 result[pair] = 1
-   
+
     return result
+
 
 def lookup(freqs, word, label):
     '''
@@ -98,34 +102,3 @@ def lookup(freqs, word, label):
         n = freqs[pair]
 
     return n
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
