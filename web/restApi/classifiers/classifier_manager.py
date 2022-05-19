@@ -8,10 +8,10 @@ class ClassifierManager:
     def __init__(self, tweet_list: list):
         self.raw_tweets = tweet_list
         self._results = {
-            TweetLabel.POLITICS: 0,
-            TweetLabel.FOOD: 0,
-            TweetLabel.SPORT: 0,
-            TweetLabel.TECHNOLOGY: 0,
+            TweetLabel.POLITICS: 0.0,
+            TweetLabel.FOOD: 0.0,
+            TweetLabel.SPORT: 0.0,
+            TweetLabel.TECHNOLOGY: 0.0,
             'predicted_tweets': []
         }
         self._initialize_classifiers()
@@ -43,7 +43,12 @@ class ClassifierManager:
             self._increase_results(Tweet(raw, label, clean_tweet))
 
     def process_tweets(self):
-        pass
+        n = len(self.raw_tweets)
+        for key, value in self._results.items():
+            if key != 'predicted_tweets':
+                self._results[key] = self._results[key] / n
+
+        return self._results
 
     def _classify(self, cleaned_tweet):
         # politics
