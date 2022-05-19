@@ -5,6 +5,7 @@ import numpy as np
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import TweetTokenizer
+import math
 
 
 # ----------------------------------
@@ -36,6 +37,7 @@ def process_tweet(tweet):
 
     return tweets_clean
 
+
 # ----------------------------------
 # Helpers
 def generate_tweets_list(dataframe_single):
@@ -56,6 +58,26 @@ def generate_tweets_list(dataframe_single):
             train_x_arr.append(ast.literal_eval(a))
 
     return train_x_arr
+
+
+def extract_features(tweet, freqs):
+    """
+    Input:
+        tweet: a list of words for one tweet
+        freqs: a dictionary corresponding to the frequencies of each tuple
+    Output:
+        x: a feature vector of dimension (1, 3)
+    """
+    x = np.zeros((1, 3))
+    x[0, 0] = 1  # bias term
+
+    for word in tweet:
+        x[0, 1] += freqs.get((word, 1.0), 0)
+
+        x[0, 2] += freqs.get((word, 0.0), 0)
+
+    assert (x.shape == (1, 3))
+    return x
 
 
 def build_freqs(train_x, train_y):
@@ -85,6 +107,7 @@ def build_freqs(train_x, train_y):
                 freqs[pair] = 1
 
     return freqs
+
 
 # --------------------------------
 # Naive Bayes Functions 
@@ -137,3 +160,30 @@ def lookup(freqs, word, label):
         n = freqs[pair]
 
     return n
+
+
+def naive_bayes_predict(tweet, logprior, loglikelihood):
+    """
+    Input:
+        tweet: a processed tweet
+        logprior: a number
+        loglikelihood: a dictionary of words mapping to numbers
+    Output:
+        p: the sum of all the logliklihoods of each word in the tweet (if found in the dictionary) + logprior (a number)
+    """
+    p = 0
+    # add the logprior
+    p += logprior
+
+    for word in tweet:
+
+        # check if the word exists in the loglikelihood dictionary
+        if word in loglikelihood:
+            # add the log likelihood of that word to the probability
+            p += loglikelihood[word]
+
+    return p
+
+
+def sigmoid(x):
+    return 1 / (1 + math.exp(-x))
