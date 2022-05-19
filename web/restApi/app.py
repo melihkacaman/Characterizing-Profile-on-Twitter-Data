@@ -1,25 +1,38 @@
 from flask import Flask, request, jsonify
 from apis.twitter_api import get_user_information, get_user_recent_tweets
-from classifiers.classifier_manager import ClassifierManager
+from classifiers.classifier_manager import Classifier
 
 app = Flask(__name__)
-manager = ClassifierManager([
-    'Biden will leverage his four-day trip to Asia to rally support for his China-countering Indo-Pacific Strategy and Indo-Pacific Economic Framework',
-    'Pie iron pizza has your name written ALL over it. Get the recipe: https://foodtv.com/3pAjMU0'
-])
-print(manager)
 
 
+# todo: deprecate it.
 @app.route('/user/<id>', methods=['GET'])
 def get_user(id):
-    return jsonify(get_user_information(id).result_object)
+    result = get_user_information(id)
+    if not result.exist_error():
+        return jsonify(result.result_object.__dict__)
+    else:
+        return jsonify(result.error.__dict__)
 
 
 @app.route('/user/<id>/tweets', methods=['GET'])
 def get_tweets(id):
     result = get_user_recent_tweets(id)
+    if not result.exist_error():
+        return jsonify(result.result_object)
+    else:
+        return jsonify(result.error.__dict__)
 
-    return jsonify(result.result_object)
+
+@app.route('/user/<id>/predict', methods=['GET'])
+def get_results(id):
+    tweet_list_result = get_user_recent_tweets(id)
+    if not tweet_list_result.exist_error():
+        manager = Classifier(tweet_list_result.result_object['tweet_list'])
+        manager.process_tweets()
+        print(manager)
+    else:
+        return jsonify(tweet_list_result.error)
 
 
 if __name__ == '__main__':

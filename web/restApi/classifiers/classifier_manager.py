@@ -4,7 +4,8 @@ from classifiers.utils import *
 from templates.tweet import *
 
 
-class ClassifierManager:
+
+class Classifier:
     def __init__(self, tweet_list: list):
         self.raw_tweets = tweet_list
         self._results = {
@@ -14,8 +15,7 @@ class ClassifierManager:
             TweetLabel.TECHNOLOGY: 0.0,
             'predicted_tweets': []
         }
-        self._initialize_classifiers()
-        self._predict_tweets()
+        self._initialize_classifiers()  # todo: singleton once
 
     def _initialize_classifiers(self):
         # 1. Politics classifier : linear SVM
@@ -43,6 +43,7 @@ class ClassifierManager:
             self._increase_results(Tweet(raw, label, clean_tweet))
 
     def process_tweets(self):
+        self._predict_tweets()
         n = len(self.raw_tweets)
         for key, value in self._results.items():
             if key != 'predicted_tweets':
