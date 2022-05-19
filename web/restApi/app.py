@@ -30,6 +30,10 @@ def get_results(id):
     if not tweet_list_result.exist_error():
         manager = Classifier(tweet_list_result.result_object['tweet_list'])
         manager.process_tweets()
+
+        manager2 = Classifier(tweet_list_result.result_object['tweet_list'])
+        manager2.process_tweets()
+
         print(manager)
     else:
         return jsonify(tweet_list_result.error)
