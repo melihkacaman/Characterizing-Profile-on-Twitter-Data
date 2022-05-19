@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from apis.twitter_api import get_user_information, get_user_recent_tweets
 from classifiers.classifier_manager import Classifier
 
@@ -28,13 +28,11 @@ def get_tweets(id):
 def get_results(id):
     tweet_list_result = get_user_recent_tweets(id)
     if not tweet_list_result.exist_error():
-        manager = Classifier(tweet_list_result.result_object['tweet_list'])
-        manager.process_tweets()
+        res = tweet_list_result.result_object
+        manager = Classifier(res['tweet_list'])
+        actual_result, json_result = manager.process_tweets()
+        return json_result
 
-        manager2 = Classifier(tweet_list_result.result_object['tweet_list'])
-        manager2.process_tweets()
-
-        print(manager)
     else:
         return jsonify(tweet_list_result.error)
 

@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 from classifiers.utils import *
 from templates.tweet import *
+import json
 
 
 class _ClassifierManager:
@@ -47,11 +48,12 @@ class Classifier:
     def __init__(self, tweet_list: list):
         self.raw_tweets = tweet_list
         self._results = {
-            TweetLabel.POLITICS: 0.0,
-            TweetLabel.FOOD: 0.0,
-            TweetLabel.SPORT: 0.0,
-            TweetLabel.TECHNOLOGY: 0.0,
+            TweetLabel.POLITICS.value: 0.0,
+            TweetLabel.FOOD.value: 0.0,
+            TweetLabel.SPORT.value: 0.0,
+            TweetLabel.TECHNOLOGY.value: 0.0,
             'predicted_tweets': []
+
         }
 
         self._classifier = ClassifierManagerSingleton.get_instance()
@@ -68,8 +70,10 @@ class Classifier:
         for key, value in self._results.items():
             if key != 'predicted_tweets':
                 self._results[key] = self._results[key] / n
+                json_result = self._results.copy()
+                json_result['predicted_tweets'] = [item.__dict__ for item in json_result['predicted_tweets']]
 
-        return self._results
+        return self._results, json.dumps(json_result)
 
     def _classify(self, cleaned_tweet):
         # politics
