@@ -26,15 +26,17 @@ def get_tweets(id):
 
 @app.route('/user/<id>/predict', methods=['GET'])
 def get_results(id):
+    print("istek geldi", id)
     tweet_list_result = get_user_recent_tweets(id)
     if not tweet_list_result.exist_error():
         res = tweet_list_result.result_object
         manager = Classifier(res['tweet_list'])
         actual_result, json_result = manager.process_tweets()
+        print("son asama json result gonderildi")
         return json_result
 
     else:
-        return jsonify(tweet_list_result.error)
+        return jsonify(tweet_list_result.error.__dict__)
 
 
 if __name__ == '__main__':

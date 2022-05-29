@@ -48,10 +48,10 @@ class Classifier:
     def __init__(self, tweet_list: list):
         self.raw_tweets = tweet_list
         self._results = {
-            TweetLabel.POLITICS.value: 0.0,
-            TweetLabel.FOOD.value: 0.0,
-            TweetLabel.SPORT.value: 0.0,
-            TweetLabel.TECHNOLOGY.value: 0.0,
+            TweetLabel.POLITICS.name: 0.0,
+            TweetLabel.FOOD.name: 0.0,
+            TweetLabel.SPORT.name: 0.0,
+            TweetLabel.TECHNOLOGY.name: 0.0,
             'predicted_tweets': []
 
         }
@@ -104,5 +104,5 @@ class Classifier:
         return list(result.items())[0]
 
     def _increase_results(self, predicted_tweet: Tweet):
-        self._results[predicted_tweet.predicted_label] += 1
+        self._results[predicted_tweet.predicted_label.name] += 1
         self._results['predicted_tweets'].append(predicted_tweet)
