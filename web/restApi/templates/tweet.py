@@ -7,6 +7,8 @@ class TweetLabel(enum.IntEnum):
     FOOD = 2
     SPORT = 3
     TECHNOLOGY = 4
+    MAGAZINE = 5
+    FITNESS = 6 
 
 
 class Tweet:

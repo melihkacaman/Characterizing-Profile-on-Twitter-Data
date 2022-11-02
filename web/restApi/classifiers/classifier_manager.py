@@ -28,6 +28,19 @@ class _ClassifierManager:
         with open('resources/technology_naivebayes_', 'rb') as f:
             self.technology_classifier = pickle.load(f)
 
+        # 5. Fitness Classifier : Logistic Regression
+        with open('resources/fitness_logisticreg', 'rb') as f:
+            self.fitness_classifier = pickle.load(f)
+
+        with open('resources/fitness_freqs', 'rb') as f:
+            self.fitness_freqs = pickle.load(f)
+
+        # 6. Magazine Classifier : Naive Bayes
+        with open('resources/magazine_naivebayes', 'rb') as f:
+            self.magazine_classifier = pickle.load(f)
+
+
+
 
 class ClassifierManagerSingleton:
     __instance = None
@@ -52,8 +65,9 @@ class Classifier:
             TweetLabel.FOOD.name: 0.0,
             TweetLabel.SPORT.name: 0.0,
             TweetLabel.TECHNOLOGY.name: 0.0,
+            TweetLabel.MAGAZINE.name: 0.0,
+            TweetLabel.FITNESS.name: 0.0,
             'predicted_tweets': []
-
         }
 
         self._classifier = ClassifierManagerSingleton.get_instance()
@@ -92,11 +106,21 @@ class Classifier:
         (logprior_technology, loglikelihood_technology) = self._classifier.technology_classifier
         result_technology = sigmoid(naive_bayes_predict(cleaned_tweet, logprior_technology, loglikelihood_technology))
 
+        # magazine
+        (logprior_magazine, loglikelihood_magazine) = self._classifier.magazine_classifier
+        result_magazine = sigmoid(naive_bayes_predict(cleaned_tweet, logprior_magazine, loglikelihood_magazine))
+
+        # fitness
+        result_fitness = self._classifier.fitness_classifier.predict_proba(
+            extract_features(cleaned_tweet, self._classifier.fitness_freqs))[0, 1]
+
         probabilities = {
             TweetLabel.POLITICS: result_politics,
             TweetLabel.FOOD: result_food,
             TweetLabel.SPORT: result_sport,
-            TweetLabel.TECHNOLOGY: result_technology
+            TweetLabel.TECHNOLOGY: result_technology,
+            TweetLabel.MAGAZINE: result_magazine,
+            TweetLabel.FITNESS: result_fitness,
         }
 
         # pick the biggest one
